@@ -2,9 +2,7 @@ const DEFAULT_CONFIG = {
   COOKIES: [], // GlaDOS 账号 Cookie
   TRIGGER_PATH: '/glados-checkin',
   TG_BOT_TOKEN: '',
-  TG_CHAT_ID: '',
-  MAX_RETRY: 3,
-  RETRY_DELAY: 3000 // 重试延迟，单位为毫秒
+  TG_CHAT_ID: ''
 };
 
 let config = { ...DEFAULT_CONFIG };
@@ -53,9 +51,7 @@ async function initializeConfig(env) {
     COOKIES: env.GR_COOKIE ? env.GR_COOKIE.split('&') : config.COOKIES,
     TRIGGER_PATH: env.TRIGGER_PATH || config.TRIGGER_PATH,
     TG_BOT_TOKEN: env.TG_BOT_TOKEN || config.TG_BOT_TOKEN,
-    TG_CHAT_ID: env.TG_CHAT_ID || config.TG_CHAT_ID,
-    MAX_RETRY: env.MAX_RETRY ? parseInt(env.MAX_RETRY) : config.MAX_RETRY,
-    RETRY_DELAY: env.RETRY_DELAY ? parseInt(env.RETRY_DELAY) : config.RETRY_DELAY
+    TG_CHAT_ID: env.TG_CHAT_ID || config.TG_CHAT_ID
   };
 }
 
