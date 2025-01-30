@@ -38,8 +38,6 @@
 | TG_BOT_TOKEN    | 否   | 123456:ABC-DEF1234ghIkl-zyx57 | 从 @BotFather 获取的机器人 Token                                      |
 | TG_CHAT_ID      | 否   | -1001234567890                | 个人聊天ID或频道ID                                                    |
 | TRIGGER_PATH    | 否   | /my-checkin                   | 自定义触发路径（默认`/glados-checkin`）                               |
-| MAX_RETRY       | 否   | 5                             | 失败重试次数（默认3次）                                               |
-| RETRY_DELAY     | 否   | 5000                          | 重试间隔（毫秒，默认3000）                                            |
 
 ### 步骤 4：设置定时任务
 1. 进入 **Triggers** 标签页
