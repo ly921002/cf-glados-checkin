@@ -24,8 +24,9 @@
 3. 点击 **Create application** > **Create Worker**
 
 ### 步骤 2：粘贴代码
-1. 在代码编辑器中清空默认内容
-2. 复制worker.js代码粘贴到编辑器中
+1. 在「Quick Edit」编辑器界面
+2. 清空默认代码，粘贴[完整代码](https://github.com/ly921002/cf-glados-checkin/blob/main/worker.js)
+3. 点击右上角「Save and Deploy」
 
 ### 步骤 3：配置环境变量
 1. 进入 Worker 的 **Settings** > **Variables**
