@@ -16,10 +16,10 @@ export default {
     if (url.pathname === config.TRIGGER_PATH) {
       try {
         const result = await runCheckin();
-        await sendTelegramNotification(`签到成功：\n${result.message}`);
+        await sendTelegramNotification(`✅ 签到成功：\n${result.message}`);
         return successResponse(result.message);
       } catch (error) {
-        await sendTelegramNotification(`签到失败：\n${error.message}`);
+        await sendTelegramNotification(`❌ 签到失败：\n${error.message}`);
         return errorResponse(error);
       }
     } else if (url.pathname === '/') {
@@ -119,7 +119,7 @@ async function runCheckin() {
   for (let cookie of config.COOKIES) {
     const result = await checkin(cookie);
     if (result) {
-      results.push(`账号：${maskString(result.email)}\n🎉 签到结果：${result.message}\n剩余天数：${result.remainDays}\n`);
+      results.push(`📧 账号邮箱：${maskString(result.email)}\n🎉 签到结果：${result.message}\n剩余天数：${result.remainDays}\n`);
     }
   }
   return { message: results.join('\n') };
