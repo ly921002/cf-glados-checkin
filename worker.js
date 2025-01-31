@@ -2,7 +2,8 @@ const DEFAULT_CONFIG = {
   COOKIES: [], // GlaDOS 账号 Cookie
   TRIGGER_PATH: '/glados-checkin',
   TG_BOT_TOKEN: '',
-  TG_CHAT_ID: ''
+  TG_CHAT_ID: '',
+  DOMAIN: 'glados.network' // 机场地址默认值
 };
 
 let config = { ...DEFAULT_CONFIG };
@@ -15,8 +16,8 @@ export default {
     if (url.pathname === config.TRIGGER_PATH) {
       try {
         const result = await runCheckin();
-        await sendTelegramNotification(`签到成功：\n${result}`);
-        return successResponse(result);
+        await sendTelegramNotification(`签到成功：\n${result.message}`);
+        return successResponse(result.message);
       } catch (error) {
         await sendTelegramNotification(`签到失败：\n${error.message}`);
         return errorResponse(error);
@@ -38,9 +39,9 @@ export default {
     await initializeConfig(env);
     try {
       const result = await runCheckin();
-      await sendTelegramNotification(`定时签到成功：\n${result}`);
+      await sendTelegramNotification(`✅ 自动签到成功：\n${result.message}`);
     } catch (error) {
-      await sendTelegramNotification(`定时签到失败：\n${error.message}`);
+      await sendTelegramNotification(`❌ 自动签到失败：\n${error.message}`);
     }
   }
 };
@@ -51,7 +52,8 @@ async function initializeConfig(env) {
     COOKIES: env.GR_COOKIE ? env.GR_COOKIE.split('&') : config.COOKIES,
     TRIGGER_PATH: env.TRIGGER_PATH || config.TRIGGER_PATH,
     TG_BOT_TOKEN: env.TG_BOT_TOKEN || config.TG_BOT_TOKEN,
-    TG_CHAT_ID: env.TG_CHAT_ID || config.TG_CHAT_ID
+    TG_CHAT_ID: env.TG_CHAT_ID || config.TG_CHAT_ID,
+    DOMAIN: env.DOMAIN || config.DOMAIN // 读取环境变量中的机场地址
   };
 }
 
@@ -110,46 +112,57 @@ async function checkin(cookie) {
 // 执行所有的签到操作
 async function runCheckin() {
   if (!config.COOKIES.length) {
-    return '未获取到GlaDOS账号Cookie';
+    return { message: '未获取到GlaDOS账号Cookie' };
   }
 
   let results = [];
   for (let cookie of config.COOKIES) {
     const result = await checkin(cookie);
     if (result) {
-      results.push(`账号：${result.email}\n签到结果：${result.message}\n剩余天数：${result.remainDays}\n`);
+      results.push(`账号：${maskString(result.email)}\n🎉 签到结果：${result.message}\n剩余天数：${result.remainDays}\n`);
     }
   }
-  return results.join('\n');
+  return { message: results.join('\n') };
 }
 
 // 发送 Telegram 通知
 async function sendTelegramNotification(message) {
-  const url = `https://api.telegram.org/bot${config.TG_BOT_TOKEN}/sendMessage`;
-  const body = {
+  const timeString = new Date().toLocaleString('zh-CN', { 
+    timeZone: 'Asia/Shanghai',
+    hour12: false 
+  });
+
+  const payload = {
     chat_id: config.TG_CHAT_ID,
-    text: message
+    text: `🕒 执行时间: ${timeString}\n\n` +
+          `🌐 机场地址: ${maskString(config.DOMAIN)}\n` +
+          `${message}`,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true
   };
 
+  const telegramAPI = `https://api.telegram.org/bot${config.TG_BOT_TOKEN}/sendMessage`;
+  
   try {
-    const response = await fetch(url, {
+    const response = await fetch(telegramAPI, {
       method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
-
-    // 记录 Telegram 请求的响应
-    const responseData = await response.json();
+    
     if (!response.ok) {
-      console.error(`Telegram API 请求失败: ${responseData.description}`);
-    } else {
-      console.log('Telegram通知发送成功');
+      console.error('Telegram通知失败:', await response.text());
     }
   } catch (error) {
-    console.error("Telegram通知发送失败:", error);
+    console.error('Telegram通知异常:', error);
   }
+}
+
+// 用于隐藏账户信息的函数
+function maskString(str, visibleStart = 2, visibleEnd = 2) {
+  if (!str) return '';
+  if (str.length <= visibleStart + visibleEnd) return str;
+  return `${str.substring(0, visibleStart)}****${str.substring(str.length - visibleEnd)}`;
 }
 
 // 成功响应
