@@ -20,8 +20,8 @@
 
 ### 步骤 1：创建 Worker
 1. 登录 [Cloudflare 控制台](https://dash.cloudflare.com/)
-2. 进入 **Workers & Pages** 服务
-3. 点击 **Create application** > **Create Worker**
+2. 进入 Workers & Pages → 创建应用程序 → 点击Hello world 模板部署 Worker
+3. 点击编辑代码，进行部署代码
 
 ### 步骤 2：粘贴代码
 1. 在「Quick Edit」编辑器界面
